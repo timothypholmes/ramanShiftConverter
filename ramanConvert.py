@@ -3,7 +3,7 @@
 ##########################################################
 #
 #           Created by: Timothy Holmes
-#              Updated: 07/27/18
+#              Updated: 09/10/18
 #            Raman shift converter
 #
 #   This program was designed to help convert between
