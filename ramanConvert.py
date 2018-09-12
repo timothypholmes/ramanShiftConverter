@@ -16,6 +16,10 @@ import math
 from Tkinter import *
 import pandas as pd
 
+## Import Data from database
+dataFrame = pd.read_csv('ramanData.csv')
+
+## Setting GUI
 root = Tk()
 root.geometry("500x500+250+250")
 root.title("Raman Shift Converter")
@@ -42,6 +46,7 @@ enterHighEndWavelengthBox = Entry(root, width=18, textvariable=HighEndWavelength
 
 #entry = tk.Entry(root)
 
+## Function that converts wave number to wavelength
 def convertNumToLen():
     laserNum = LaserWavelengthBoxNum.get()
     lowWaveNum = LowEndWaveNumberNum.get()
@@ -52,6 +57,9 @@ def convertNumToLen():
     #highWavelenNum = (float(1)/laserNum - float(1)/highWaveNum)*10**7
     #lowWavelenNum = float(1)/((float(1)/laserNum) - (lowWaveNum/(10**7)))
     #highWavelenNum = float(1)/((float(1)/laserNum) - (highWaveNum/(10**7)))
+    lowRamanShift = dataFrame.loc[:,'low_raman_shift (cm^-1)']
+    highRamanShift = dataFrame.loc[:,'high_raman_shift (cm^-1)']
+    molecule = dataFrame.loc[:,'Molecule']
     lowWavelenNum = laserNum*10**7/(10**7-laserNum*lowWaveNum)
     highWavelenNum = laserNum*10**7/(10**7-laserNum*highWaveNum)
 
@@ -64,18 +72,32 @@ def convertNumToLen():
 
         lab1 = Label(root, text=("Error: One of the calculated values produces a negative number. ")).place(x=10, y=270)
 
+    #if (molecule in Range(lowRamanShift <= lowWaveNum and highRamanShift >= highWaveNum)):
+        #lab3 = Label(root, text=("The molecule is: " molecule).place(x=10, y=350)
+        #print(molecule)
+        #lab4 = Label(root, text=("The molecule is" + molecule)).place(x=10, y=310)
+
+## Function that converts wavelength to wave number
 def convertLenToNum():
     laserNum = LaserWavelengthBoxNum.get()
     lowWaveNum = LowEndWaveNumberNum.get()
     highWaveNum = HighEndWaveNumberNum.get()
     lowWavelenNum = LowEndWavelengthNum.get()
     highWavelenNum = HighEndWavelengthNum.get()
-    lowWaveNum = (float(1)/laserNum - float(1)/lowWavelenNum)*10**(7)
-    highWaveNum = (float(1)/laserNum - float(1)/highWavelenNum)*10**(7)
+    lowRamanShift = dataFrame.loc[:,'low_raman_shift (cm^-1)']
+    highRamanShift = dataFrame.loc[:,'high_raman_shift (cm^-1)']
+    molecule = dataFrame.loc[:,'Molecule']
     #lowWaveNum.delete(0, END)
     #lowWaveNum.insert(0, lowWavelenNum)
     #highWaveNum.delete(0, END)
     #highWaveNum.insert(0, lowWavelenNum)
+    lowWaveNum = (float(1)/laserNum - float(1)/lowWavelenNum)*10**(7)
+    highWaveNum = (float(1)/laserNum - float(1)/highWavelenNum)*10**(7)
+
+    #print("low raman shift" + str(lowRamanShift))
+    #print("high raman shift" + str(highRamanShift))
+    #print("molecule" + str(molecule))
+
     if (lowWaveNum > 0 and highWaveNum > 0):
 
         lab1 = Label(root, text=("Low wave number: " + str(lowWaveNum) + " cm^-1")).place(x=10, y=270)
@@ -85,33 +107,39 @@ def convertLenToNum():
 
         lab1 = Label(root, text=("Error: One of the calculated values produces a negative number. ")).place(x=10, y=270)
 
-dataFrame = pd.read_csv('ramanData.csv')
-#print(dataFrame.loc[:,'Molecule'])
+    #if ((lowRamanShift >= lowWaveNum) & (highRamanShift <= highWaveNum)):
+    if ((lowRamanShift >= lowWaveNum).all() & (highRamanShift <= highWaveNum).all()):
+        return molecule.all()
+        #lab4 = Label(root, text=("The molecule is" + str(molecule))).place(x=10, y=310)
 
 
+    #if ((dataFrame['low_raman_shift (cm^-1)'] >= lowWaveNum).all() & (dataFrame['high_raman_shift (cm^-1)'] <= highWaveNum).all()):
+        #lab3 = Label(root, text=("The molecule is: " molecule).place(x=10, y=350)
+        #print(str(dataFrame['Molecule']).all())
+        #lab4 = Label(root, text=("The molecule is" + str(molecule))).place(x=10, y=310)
 
-def findRangeInDatabase():
-    laserNum = LaserWavelengthBoxNum.get()
-    lowWaveNum = LowEndWaveNumberNum.get()
-    highWaveNum = HighEndWaveNumberNum.get()
-    lowWavelenNum = LowEndWavelengthNum.get()
-    highWavelenNum = HighEndWavelengthNum.get()
+#def findRangeInDatabase():
+#    laserNum = LaserWavelengthBoxNum.get()
+#    lowWaveNum = LowEndWaveNumberNum.get()
+#    highWaveNum = HighEndWaveNumberNum.get()
+#    lowWavelenNum = LowEndWavelengthNum.get()
+#    highWavelenNum = HighEndWavelengthNum.get()
 
-    lowWaveNum = (float(1)/laserNum - float(1)/lowWavelenNum)*10**(7)
-    highWaveNum = (float(1)/laserNum - float(1)/highWavelenNum)*10**(7)
+#    lowWaveNum = (float(1)/laserNum - float(1)/lowWavelenNum)*10**(7)
+#    highWaveNum = (float(1)/laserNum - float(1)/highWavelenNum)*10**(7)
 
-    lab1 = Label(root, text=("Low wave number: " + str(lowWaveNum) + " cm^-1")).place(x=10, y=270)
-    lab2 = Label(root, text=("High wave number: " + str(highWaveNum) + " cm^-1")).place(x=10, y=290)
+#    lab1 = Label(root, text=("Low wave number: " + str(lowWaveNum) + " cm^-1")).place(x=10, y=270)
+#    lab2 = Label(root, text=("High wave number: " + str(highWaveNum) + " cm^-1")).place(x=10, y=290)
 
-    lowRamanShift = dataFrame.loc[:,'low_raman_shift (cm^-1)']
-    highRamanShift = dataFrame.loc[:,'high_raman_shift (cm^-1)']
-    molecule = dataFrame.loc[:,'Molecule']
+#    lowRamanShift = dataFrame.loc[:,'low_raman_shift (cm^-1)']
+#    highRamanShift = dataFrame.loc[:,'high_raman_shift (cm^-1)']
+#    molecule = dataFrame.loc[:,'Molecule']
 
     #if (lowWaveNum >= lowRamanShift and highWaveNum <= highRamanShift
-    if (molecule in Range(lowRamanShift <= lowWaveNum ,highRamanShift >= highWaveNum)):
+#    if (molecule in Range(lowRamanShift <= lowWaveNum and highRamanShift >= highWaveNum)):
         #lab3 = Label(root, text=("The molecule is: " molecule).place(x=10, y=350)
-        print(molecule)
-        lab4 = Label(root, text=("The molecule is" + molecule)).place(x=10, y=310)
+#        print(molecule)
+#        lab4 = Label(root, text=("The molecule is" + molecule)).place(x=10, y=310)
 
 topFrame = Frame(root)
 topFrame.pack()
